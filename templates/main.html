@@ -9,18 +9,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
-    <title>Document</title>
+    <title>Main</title>
 </head>
 <body>
     <body>
-        <div>
-          <h2>
-            Welcome<br>
-            to the main page!
-          </h2>
-        </div>
-    <form action="/ethical_test" method="POST">
-        <input type ="submit" value = "Ethical Test For Employee">
-    </form>
+        <div class = "container">
+            <h2>Welcome to Main Menu!</h2>
+            <form action="/foodexp" method="POST">
+                <input type ="submit" value = "Prediction Econ Food Expenditure">
+            </form>
+            <form action="/ethical_test" method="POST">
+                <input type ="submit" value = "Ethical Test For Employee">
+            </form>
 </body>
 </html>
