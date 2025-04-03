@@ -2,6 +2,5 @@ flask
 google-generativeai
 gunicorn
 pysqlite3
-sqlite3
 datetime
 wikipedia
