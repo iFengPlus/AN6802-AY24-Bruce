@@ -3,6 +3,7 @@ import sqlite3
 import datetime
 import google.generativeai as genai
 import os
+import wikipedia
 
 api = "AIzaSyBvcDnn2upjJwSWw89RDx99lFaIv2DCif0"
 model = genai.GenerativeModel("gemini-1.5-flash")
@@ -35,14 +36,23 @@ def main():
 def foodexp():
     return(render_template("foodexp.html"))
 
+@app.route("/foodexp1",methods=["POST","GET"])
+def foodexp1():
+    return(render_template("foodexp1.html"))
+ 
+@app.route("/foodexp2",methods=["POST","GET"])
+def foodexp2():
+    return(render_template("foodexp2.html"))
+
 @app.route("/FAQ",methods=["POST","GET"])
 def FAQ():
     return(render_template("FAQ.html"))
 
 @app.route("/FAQ1",methods=["POST","GET"])
 def FAQ1():
-    r = model.generate_content("Factors for Profit")
-    return(render_template("FAQ1.html",r=r.candidates[0].content.parts[0]))
+    r=model.generate_content("Factors for Profit")
+    r=r.candidates[0].content.parts[0].text
+    return(render_template("FAQ1.html",r=r))
 
 @app.route("/ethical_test",methods=["POST","GET"])
 def ethical_test():
@@ -83,6 +93,13 @@ def deleteLog():
     c.close()
     conn.close()
     return(render_template("deleteLog.html"))
+
+
+@app.route("/FAQinput",methods=["POST","GET"])
+def FAQinput():
+     q  = request.form.get("q")
+     r=wikipedia.summary(q)
+     return(render_template("FAQinput.html",r=r))
 
 if __name__ == "__main__":
     app.run()
