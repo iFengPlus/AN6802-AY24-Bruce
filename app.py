@@ -4,6 +4,8 @@ import datetime
 import google.generativeai as genai
 import os
 import wikipedia
+import threading
+
 
 api = "AIzaSyBvcDnn2upjJwSWw89RDx99lFaIv2DCif0"
 model = genai.GenerativeModel("gemini-1.5-flash")
@@ -83,6 +85,71 @@ def userLog():
     c.close()
     conn.close()
     return(render_template("userLog.html",r=r))
+
+import threading
+
+@app.route("/telegram_predict", methods=["POST", "GET"])
+def telegram_predict():
+    def start_bot():
+        import time
+        import requests
+
+        telegram_api = "7845485789:AAFfSdEIiRcdPP40xxpknxwr_fH6u0oFrh0"  # ⚠️ 建议替换为安全方式，例如读取环境变量
+        url = f"https://api.telegram.org/bot{telegram_api}/"
+        updates = url + 'getUpdates'
+
+        print("Waiting for user to send the first message...")
+
+        chat_id = None
+        while not chat_id:
+            try:
+                r = requests.get(updates).json()
+                if "result" in r and len(r["result"]) > 0:
+                    last_msg = r["result"][-1]["message"]
+                    chat_id = last_msg["chat"]["id"]
+                    print("Chat ID acquired:", chat_id)
+            except Exception as e:
+                print("Error getting updates:", e)
+            time.sleep(2)
+
+        prompt = "Please enter the inflation rate in %(type exit to break): "
+        err_msg = "Please enter a number"
+
+        # 发第一条提示消息
+        msg = url + f"sendMessage?chat_id={chat_id}&text={prompt}"
+        requests.get(msg)
+
+        flag = ""
+        while True:
+            time.sleep(5)
+            try:
+                r = requests.get(updates).json()
+                if "result" not in r or len(r["result"]) == 0:
+                    continue
+                last_msg = r["result"][-1]["message"]
+                user_input = last_msg["text"]
+
+                if flag != user_input:
+                    flag = user_input
+                    if user_input.isnumeric():
+                        reply = "The predicted interest rate is " + str(float(user_input) + 1.5)
+                        msg = url + f"sendMessage?chat_id={chat_id}&text={reply}"
+                        requests.get(msg)
+                    else:
+                        if user_input.lower() == "exit":
+                            break
+                        else:
+                            msg = url + f"sendMessage?chat_id={chat_id}&text={err_msg}"
+                            requests.get(msg)
+            except Exception as e:
+                print("Error during processing:", e)
+            time.sleep(8)
+
+    # 启动后台线程
+    threading.Thread(target=start_bot).start()
+
+    return render_template("telegram_predict.html")
+
 
 @app.route("/deleteLog",methods=["POST","GET"])
 def deleteLog():
