@@ -4,4 +4,3 @@ gunicorn
 pysqlite3
 datetime
 wikipedia
-threading
